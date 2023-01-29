@@ -20,7 +20,13 @@ func HandleHomeRoute(w http.ResponseWriter, r *http.Request) {
 func GetOrders(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Получить все заказы")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(model.Orders)
+
+	if len(model.Orders) > 0 {
+		json.NewEncoder(w).Encode(model.Orders)
+
+	} else {
+		json.NewEncoder(w).Encode("Список заказов пуст")
+	}
 }
 
 func GetOrder(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +65,7 @@ func CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	order.OrderId = strconv.Itoa(rand.Intn(100))
+	order.OrderId = strconv.Itoa(rand.Intn(999))
 
 	model.Orders = append(model.Orders, order)
 	json.NewEncoder(w).Encode(order)
@@ -95,8 +101,10 @@ func DeleteOrder(w http.ResponseWriter, r *http.Request) {
 	for index, order := range model.Orders {
 		if order.OrderId == params["id"] {
 			model.Orders = append(model.Orders[:index], model.Orders[index+1:]...)
-			json.NewEncoder(w).Encode("Deleted")
+			json.NewEncoder(w).Encode("Заказ удален")
 			break
+		} else {
+			json.NewEncoder(w).Encode("Такого заказа не найдено")
 		}
 
 	}
